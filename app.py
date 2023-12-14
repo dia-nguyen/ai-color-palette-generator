@@ -2,15 +2,16 @@ import openai
 import json
 from flask import Flask, render_template, request
 from dotenv import dotenv_values
-
-config = dotenv_values('.env')
-openai.api_key = config["OPENAI_API_KEY"]
+import os
 
 app = Flask(__name__,
     template_folder="templates",
     static_url_path = '',
     static_folder = 'static',
 )
+
+app.config['OPENAI_API_KEY'] = os.environ.get('OPENAI_API_KEY')
+openai.api_key = app.config["OPENAI_API_KEY"]
 
 @app.route("/")
 def index():
