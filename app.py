@@ -1,8 +1,8 @@
-import openai
+from openai import OpenAI
 import json
 from flask import Flask, render_template, request
-from dotenv import dotenv_values
 import os
+
 
 app = Flask(__name__,
     template_folder="templates",
@@ -10,8 +10,7 @@ app = Flask(__name__,
     static_folder = 'static',
 )
 
-app.config['OPENAI_API_KEY'] = os.environ.get('OPENAI_API_KEY')
-openai.api_key = app.config["OPENAI_API_KEY"]
+client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
 @app.route("/")
 def index():
@@ -28,25 +27,21 @@ def prompt_to_palette():
 
 def get_colors(msg):
     """Makes a request to open ai to return list of color palette"""
-    prompt = f"""
-        You are a color palette generating assistant that responds to text prompts for color palettes
-        You should generate color palettes that fit the theme, mood, or instructions in the prompt.
-        The palette should be between 2 and 6 colors.
 
-        Desired format: JSON array of hex color codes
+    messages = [
+        {"role": "system", "content": "You are a color palette generating assistant that responds to text prompts for color palettes. You should generate color palettes that fit the theme, mood, or instructions in the prompt. The palette should be between 3 and 6 colors."},
+        {"role": "user", "content": "Convert the following verbal description of a color palette into a list of colors: sage, nature, earth"},
+        {"role": "assistant", "content": '["#006699", "#66CCCC", "#F0E68C", "#008000", "#F08080"]'},
+        {"role": "user", "content": f"Convert the following verbal description of a color palette into a list of colors: {msg}"}
+    ]
 
-        Text: {msg}
-
-        Response:
-    """
-
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        max_tokens=200
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        max_tokens=200,
     )
 
-    return json.loads(response["choices"][0]["text"])
+    return json.loads(response.choices[0].message.content)
 
 if __name__ == "__main__":
     app.run(debug=True)
