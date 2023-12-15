@@ -1,6 +1,6 @@
 # AI Color Generator
 
-Exercise with Open AI's Completion API (now deprecated) using the davinci-003 model.
+Exercise with Open AI's Chat API using the gpt-3.5-turbo model.
 Enter a prompt to generate your very own color palette.
 
 https://github.com/dia-nguyen/ai-color-palette-generator/assets/40869031/b5fc5acb-8ab3-4ac0-89ee-c997bb538982
